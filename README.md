@@ -73,7 +73,6 @@ The application is divided into multiple components:
 ### Important Step: Add Your PDF Files
 
 The system does **not include PDF files by default**.
-
 You must manually add them:
     --> Place your research papers inside the `data/` folder  
 Example:
@@ -86,10 +85,20 @@ Only files placed in this directory will be processed.
 
 ### Environment Configuration
 
-1. Copy `.env.example` → `.env`  
+1. Copy `.env.example` --> `.env`  
 2. Open `.env` file  
-3. Insert your API key:
-    OPENROUTER_API_KEY=your_key_here
+You can configure which API to use by setting:
+    LLM_PROVIDER=openai
+or
+    LLM_PROVIDER=openrouter
+3. Depending on the selected provider, set the corresponding key:
+For OpenAI:
+    OPENAI_API_KEY=your_openai_key_here
+For OpenRouter:
+    OPENROUTER_API_KEY=your_openrouter_key_here
+- If `LLM_PROVIDER` is not specified, the system uses *OpenAI by default*
+- The program automatically initializes the correct API client at runtime  
+- No code modification is required to switch between providers
 
 ---
 
@@ -117,7 +126,6 @@ Once the program starts, you will see:
     outputs/publications.jsonl
     outputs/publications.xlsx
 
-
 ---
 
 ### Option 2: Search
@@ -142,17 +150,18 @@ All generated results are stored in the `outputs/` directory:
 ## Project Structure
 
 src/ --> main program modules
-    src/main.py --> entry point and CLI interaction  
-    src/pdf_reader.py --> extracts text from PDF files  
+    src/main.py --> program entry point and CLI interface  
+    src/llm_client.py --> handles API selection (OpenAI / OpenRouter) and client creation  
+    src/pdf_reader.py --> extracts raw text from PDF files  
     src/metadata_extractor.py --> extracts structured metadata using LLM  
-    src/keyword_extractor.py --> generates keywords using LLM  
-    src/processor.py --> processes all PDFs and builds dataset  
+    src/keyword_extractor.py --> generates technical keywords using LLM  
+    src/processor.py --> main pipeline for processing all PDFs  
     src/search.py --> performs keyword-based search and ranking  
-    src/utils.py --> handles saving outputs (JSONL, Excel) 
-    data/ --> input PDF files (user-provided)
-outputs/ --> generated results
-.env.example --> API key configuration
-README.md --> project documentation
+    src/utils.py --> handles saving outputs (JSONL and Excel) and data cleaning  
+data/ --> input PDF files (user-provided)  
+outputs/ --> generated results (JSONL, Excel, search outputs)  
+.env.example --> environment configuration template  
+README.md --> project documentation  
 
 ---
 
@@ -172,7 +181,7 @@ The workflow of the system:
 ## Notes and Limitations
 
 - Some PDFs may not parse correctly due to formatting issues  
-- LLM responses may occasionally require validation (handled in code)  
+- LLM responses may occasionally require validation  
 - Keyword matching is based on simple scoring (not semantic similarity)  
 
 ---
